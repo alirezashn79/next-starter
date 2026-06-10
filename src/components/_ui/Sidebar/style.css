@@ -1,0 +1,10 @@
+.menu {
+    & :where(li) {
+
+        &> :not(ul, .menu-title, details, .btn):active,
+        &> :not(ul, .menu-title, details, .btn).menu-active,
+        &>details>summary:active {
+            background-color: var(--color-accent)
+        }
+    }
+}
