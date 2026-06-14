@@ -1,116 +1,93 @@
-'use client'
-import { useState } from 'react';
-import RichTextEditor, { BaseKit } from 'reactjs-tiptap-editor';
-import { Blockquote } from 'reactjs-tiptap-editor/blockquote';
-import { Bold } from 'reactjs-tiptap-editor/bold';
-import { BulletList } from 'reactjs-tiptap-editor/bulletlist';
-import { Color } from 'reactjs-tiptap-editor/color';
-import { FontSize } from 'reactjs-tiptap-editor/fontsize';
-import { Heading } from 'reactjs-tiptap-editor/heading';
-import { Highlight } from 'reactjs-tiptap-editor/highlight';
-import { History } from 'reactjs-tiptap-editor/history';
-import { HorizontalRule } from 'reactjs-tiptap-editor/horizontalrule';
-import { Image } from 'reactjs-tiptap-editor/image';
-import { Italic } from 'reactjs-tiptap-editor/italic';
-import { Link } from 'reactjs-tiptap-editor/link';
-import { OrderedList } from 'reactjs-tiptap-editor/orderedlist';
-import { SlashCommand } from 'reactjs-tiptap-editor/slashcommand';
-import { Strike } from 'reactjs-tiptap-editor/strike';
-import { Table } from 'reactjs-tiptap-editor/table';
-import { TableOfContents } from 'reactjs-tiptap-editor/tableofcontent';
-import { TextAlign } from 'reactjs-tiptap-editor/textalign';
-import { TextUnderline } from 'reactjs-tiptap-editor/textunderline';
+'use client';
 
-import 'reactjs-tiptap-editor/style.css';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
+import 'suneditor/dist/css/suneditor.min.css';
 
-const extensions = [
-    BaseKit.configure({
-        placeholder: { showOnlyCurrent: true },
-        characterCount: false,
-    }),
+const SunEditor = dynamic(() => import('suneditor-react'), {
+    ssr: false,
+});
 
-    History,
-    TableOfContents,
-    Heading.configure({ spacer: true }),
-    FontSize,
-    Bold,
-    Italic,
-    TextUnderline,
-    Strike,
-    Color.configure({ spacer: true }),
-    Highlight,
-    BulletList,
-    OrderedList,
-    TextAlign.configure({ types: ['heading', 'paragraph'], spacer: true }),
+interface EditorProps {
+    defaultContent?: string;
+    onChange?: (val: string) => void;
+    [key: string]: any;
+}
 
-    Link,
-    Image.configure({
-        upload: (files: File) => {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(URL.createObjectURL(files));
-                }, 500);
-            });
-        },
-    }),
-
-    Blockquote,
-    SlashCommand,
-    HorizontalRule,
-    Table,
-];
-
-function Editor({
+export default function Editor({
     defaultContent = '',
     onChange,
     ...rest
-}: {
-    defaultContent?: string;
-    onChange?: (val: string) => void;
-}) {
-    const [content, setContent] = useState(defaultContent);
+}: EditorProps) {
+    const [isMounted, setIsMounted] = useState(false);
 
-    const onValueChange = (value: string) => {
-        setContent(value);
-        onChange?.(value); // 🔁 Send to parent
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    const handleChange = (content: string) => {
+        if (onChange) {
+            onChange(content);
+        }
     };
 
-    return (
-        <main
-            style={{
-                padding: '0 20px',
-            }}
-        >
-            <div
-                style={{
-                    maxWidth: 1024,
-                    margin: '40px auto 40px',
-                }}
-            >
-                <RichTextEditor
-                    output='html'
-                    content={content}
-                    onChangeContent={onValueChange}
-                    extensions={extensions}
-                    {...rest}
-                />
+    if (!isMounted) {
+        return (
+            <main style={{ padding: '0 20px' }}>
+                <div
+                    style={{
+                        maxWidth: 1024,
+                        margin: '0 auto',
+                        height: 'auto',
+                        backgroundColor: '#f9f9f9',
+                        borderRadius: 8,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}
+                >
+                    Loading...
+                </div>
+            </main>
+        );
+    }
 
-                {/* {typeof content === 'string' && (
-                    <textarea
-                        className='textarea'
-                        style={{
-                            marginTop: 20,
-                            height: 500,
-                            width: '100%',
-                            borderRadius: 4,
-                            padding: 10,
-                        }}
-                        value={content}
-                    />
-                )} */}
+    return (
+        <main style={{ padding: '0 20px' }} {...rest}>
+            <div style={{ maxWidth: 1024, margin: '0 auto' }}>
+                <SunEditor
+                    defaultValue={defaultContent}
+                    onChange={handleChange}
+                    setOptions={{
+                        height: 'auto',
+                        minHeight: '400px',
+                        buttonList: [
+                            ['undo', 'redo'],
+                            ['font', 'fontSize', 'formatBlock'],
+                            ['paragraphStyle', 'blockquote'],
+                            [
+                                'bold',
+                                'underline',
+                                'italic',
+                                'strike',
+                                'subscript',
+                                'superscript',
+                            ],
+                            ['fontColor', 'hiliteColor', 'textStyle'],
+                            ['removeFormat'],
+                            '/',
+                            ['outdent', 'indent'],
+                            ['align', 'horizontalRule', 'list', 'lineHeight'],
+                            ['table', 'link', 'image', 'video'],
+                            ['fullScreen', 'showBlocks', 'codeView'],
+                            ['preview', 'print'],
+                        ],
+                        defaultTag: 'p',
+                        showPathLabel: false,
+                        resizingBar: false,
+                    }}
+                />
             </div>
         </main>
     );
 }
-
-export default Editor;
