@@ -37,11 +37,11 @@ export default function MainLayout({
                         <Suspense>
                             <ToastContainer />
                         </Suspense>
-                        <div className='min-h-screen flex flex-col'>
+                        <main className='min-h-screen flex flex-col'>
                             <Header />
                             {children}
                             <Footer />
-                        </div>
+                        </main>
                     </NuqsAdapter>
                 </ReactQueryProvider>
             </body>
