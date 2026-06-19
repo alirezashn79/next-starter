@@ -10,8 +10,8 @@ import { Suspense } from 'react';
 import './globals.css';
 
 export const metadata: Metadata = {
-    title: 'Base Front App',
-    description: 'Base Front App',
+    title: 'Next Starter',
+    description: 'Next Starter',
     robots: 'noindex, nofollow',
 };
 
