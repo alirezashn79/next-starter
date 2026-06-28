@@ -1,5 +1,6 @@
 import { ApiError } from '@/utils/types/DTO/http-errors.interface';
 import { errorHandler, networkErrorStrategy } from '../http-error-strategies';
+import { ApiResponse } from '@/utils/types/DTO/api-response.type';
 
 class HttpClient {
     private baseURL: string;
@@ -8,7 +9,10 @@ class HttpClient {
         this.baseURL = baseURL;
     }
 
-    private async request(path: string, options: RequestInit = {}) {
+    private async request<T = any>(
+        path: string,
+        options: RequestInit = {},
+    ): Promise<ApiResponse<T>> {
         const url = `${this.baseURL}${path}`;
 
         const headers: Record<string, string> = {
@@ -47,7 +51,7 @@ class HttpClient {
                 return Promise.reject({ status: response.status, data });
             }
 
-            return data;
+            return data as ApiResponse<T>;
         } catch (error) {
             return Promise.reject(error);
         }
@@ -64,24 +68,42 @@ class HttpClient {
         }
     }
 
-    get(path: string, options?: Omit<RequestInit, 'body'>) {
-        return this.request(path, { ...options, method: 'GET' });
+    get<T = any>(
+        path: string,
+        options?: Omit<RequestInit, 'body'>,
+    ): Promise<ApiResponse<T>> {
+        return this.request<T>(path, { ...options, method: 'GET' });
     }
 
-    post(path: string, body: any, options?: Omit<RequestInit, 'body'>) {
-        return this.request(path, { ...options, method: 'POST', body });
+    post<T = any>(
+        path: string,
+        body: any,
+        options?: Omit<RequestInit, 'body'>,
+    ): Promise<ApiResponse<T>> {
+        return this.request<T>(path, { ...options, method: 'POST', body });
     }
 
-    put(path: string, body: any, options?: Omit<RequestInit, 'body'>) {
-        return this.request(path, { ...options, method: 'PUT', body });
+    put<T = any>(
+        path: string,
+        body: any,
+        options?: Omit<RequestInit, 'body'>,
+    ): Promise<ApiResponse<T>> {
+        return this.request<T>(path, { ...options, method: 'PUT', body });
     }
 
-    patch(path: string, body: any, options?: Omit<RequestInit, 'body'>) {
-        return this.request(path, { ...options, method: 'PATCH', body });
+    patch<T = any>(
+        path: string,
+        body: any,
+        options?: Omit<RequestInit, 'body'>,
+    ): Promise<ApiResponse<T>> {
+        return this.request<T>(path, { ...options, method: 'PATCH', body });
     }
 
-    delete(path: string, options?: Omit<RequestInit, 'body'>) {
-        return this.request(path, { ...options, method: 'DELETE' });
+    delete<T = any>(
+        path: string,
+        options?: Omit<RequestInit, 'body'>,
+    ): Promise<ApiResponse<T>> {
+        return this.request<T>(path, { ...options, method: 'DELETE' });
     }
 }
 
